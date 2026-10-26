@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: waha_whatsapp
+    ports:
+      - "3000:3000"
+    environment:
+      - WAHA_ZIPPER_TYPE=GZIP
+      - WHATSAPP_DEFAULT_ENGINE=WEBJS
+    restart: always
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n_automation
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: always
+
+volumes:
+  n8n_data:

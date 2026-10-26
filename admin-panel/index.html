@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Califnco HydroPure - Admin & Service Desk Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-cyan-600 rounded-lg flex items-center justify-center text-white text-xl">
+          <i class="fa-solid fa-droplet"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white">Califnco HydroPure Admin</h1>
+          <p class="text-xs text-slate-400">E-Commerce & RO Service Desk Control Panel</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Live Vercel Deployment
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-slate-700 mb-8 space-x-4">
+      <button onclick="switchTab('orders')" id="tab-orders" class="pb-3 px-4 font-bold text-cyan-400 border-b-2 border-cyan-400 flex items-center gap-2">
+        <i class="fa-solid fa-cart-shopping"></i> Orders Management (<span id="orders-count">2</span>)
+      </button>
+      <button onclick="switchTab('dealers')" id="tab-dealers" class="pb-3 px-4 font-semibold text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-store"></i> Dealer Approvals (<span id="dealers-count">1</span>)
+      </button>
+      <button onclick="switchTab('service')" id="tab-service" class="pb-3 px-4 font-semibold text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-screwdriver-wrench"></i> RO Service Desk (<span id="service-count">1</span>)
+      </button>
+    </div>
+
+    <!-- Orders Tab Section -->
+    <section id="sec-orders" class="space-y-4">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold text-white">All Customer & Wholesale Dealer Orders</h2>
+        <button onclick="addMockOrder()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs px-3 py-2 rounded-lg font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> Simulate New Order
+        </button>
+      </div>
+      <div id="orders-list" class="grid gap-4 md:grid-cols-2"></div>
+    </section>
+
+    <!-- Dealer Approvals Tab Section -->
+    <section id="sec-dealers" class="hidden space-y-4">
+      <h2 class="text-lg font-bold text-white mb-4">Pending Dealer Applications</h2>
+      <div id="dealers-list" class="grid gap-4 md:grid-cols-2"></div>
+    </section>
+
+    <!-- Service Desk Tab Section -->
+    <section id="sec-service" class="hidden space-y-4">
+      <h2 class="text-lg font-bold text-white mb-4">Water Purifier Maintenance & Repair Requests</h2>
+      <div id="service-list" class="grid gap-4 md:grid-cols-2"></div>
+    </section>
+
+  </main>
+
+  <script>
+    // State Data
+    let orders = [
+      { id: 'ORD_88201', customer: 'Rahul Sharma (+91 9876543210)', item: '1x HydroPure Grand RO+UV', amount: '₹12,999', address: 'Sector 15, New Delhi', status: 'PROCESSING', isDealer: false },
+      { id: 'ORD_88190', customer: 'Apex Aqua Enterprises', item: '10x Diaphragm Booster Pumps (Bulk)', amount: '₹11,500', address: 'Industrial Area Phase 2, Mumbai', status: 'SHIPPED', isDealer: true }
+    ];
+
+    let pendingDealers = [
+      { id: 'usr_deal_02', company: 'Metro Water Solutions', name: 'Sanjay Patel', email: 'sanjay@metrowater.com', gst: '07BBAAC567811Z9' }
+    ];
+
+    let serviceRequests = [
+      { id: 'SRV_1092', customer: 'Rahul Sharma', model: 'HydroPure Grand RO+UV', type: 'Filter Replacement & Maintenance', date: '2026-10-28 (10:00 AM)', status: 'ASSIGNED', tech: 'Amit Kumar (TK-402)' }
+    ];
+
+    function renderOrders() {
+      const container = document.getElementById('orders-list');
+      document.getElementById('orders-count').innerText = orders.length;
+      container.innerHTML = orders.map(o => `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <span class="text-xs font-mono font-bold text-cyan-400">#${o.id}</span>
+              ${o.isDealer ? '<span class="ml-2 bg-amber-500/20 text-amber-400 text-[10px] px-2 py-0.5 rounded font-bold">WHOLESALE DEALER</span>' : ''}
+              <h3 class="font-bold text-white mt-1">${o.customer}</h3>
+            </div>
+            <span class="text-lg font-bold text-emerald-400">${o.amount}</span>
+          </div>
+          <p class="text-xs text-slate-300 mb-1">Items: <span class="font-semibold text-slate-100">${o.item}</span></p>
+          <p class="text-xs text-slate-400 mb-4"><i class="fa-solid fa-location-dot text-slate-500"></i> ${o.address}</p>
+          <div class="flex justify-between items-center pt-3 border-t border-slate-700">
+            <span class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-md border border-amber-400/20">${o.status}</span>
+            <div class="space-x-1">
+              <button onclick="updateOrderStatus('${o.id}', 'PROCESSING')" class="bg-slate-700 hover:bg-slate-600 text-xs px-2.5 py-1 rounded text-slate-200">Process</button>
+              <button onclick="updateOrderStatus('${o.id}', 'SHIPPED')" class="bg-blue-600 hover:bg-blue-500 text-xs px-2.5 py-1 rounded text-white font-semibold">Ship</button>
+              <button onclick="updateOrderStatus('${o.id}', 'DELIVERED')" class="bg-emerald-600 hover:bg-emerald-500 text-xs px-2.5 py-1 rounded text-white font-semibold">Deliver</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderDealers() {
+      const container = document.getElementById('dealers-list');
+      document.getElementById('dealers-count').innerText = pendingDealers.length;
+      if (pendingDealers.length === 0) {
+        container.innerHTML = '<p class="text-slate-400 text-sm">No pending dealer applications.</p>';
+        return;
+      }
+      container.innerHTML = pendingDealers.map(d => `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
+          <h3 class="font-bold text-white text-base">${d.company}</h3>
+          <p class="text-xs text-slate-300 mt-1">Applicant: ${d.name} (${d.email})</p>
+          <p class="text-xs font-mono font-bold text-amber-400 mt-1">GST: ${d.gst}</p>
+          <div class="flex justify-end gap-2 mt-4 pt-3 border-t border-slate-700">
+            <button onclick="rejectDealer('${d.id}')" class="bg-red-500/20 text-red-400 border border-red-500/30 text-xs px-3 py-1.5 rounded-lg hover:bg-red-500/30 font-semibold">Reject</button>
+            <button onclick="approveDealer('${d.id}')" class="bg-emerald-600 text-white text-xs px-4 py-1.5 rounded-lg hover:bg-emerald-500 font-bold">Approve Wholesale Dealer</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderService() {
+      const container = document.getElementById('service-list');
+      document.getElementById('service-count').innerText = serviceRequests.length;
+      container.innerHTML = serviceRequests.map(s => `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-mono font-bold text-cyan-400">#${s.id}</span>
+            <span class="text-xs font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30">${s.status}</span>
+          </div>
+          <h3 class="font-bold text-white">${s.model}</h3>
+          <p class="text-xs text-slate-300">Customer: ${s.customer}</p>
+          <p class="text-xs text-slate-400">Service: ${s.type}</p>
+          <p class="text-xs text-cyan-300 font-semibold mt-2"><i class="fa-solid fa-user-gear"></i> Technician: ${s.tech}</p>
+          <div class="flex justify-end gap-2 mt-4 pt-3 border-t border-slate-700">
+            <button onclick="completeService('${s.id}')" class="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-emerald-500 font-semibold">Mark Service Completed</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchTab(tab) {
+      ['orders', 'dealers', 'service'].forEach(t => {
+        document.getElementById(`sec-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).className = "pb-3 px-4 font-semibold text-slate-400 hover:text-slate-200 flex items-center gap-2";
+      });
+      document.getElementById(`sec-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).className = "pb-3 px-4 font-bold text-cyan-400 border-b-2 border-cyan-400 flex items-center gap-2";
+    }
+
+    function updateOrderStatus(id, newStatus) {
+      orders = orders.map(o => o.id === id ? { ...o, status: newStatus } : o);
+      renderOrders();
+    }
+
+    function approveDealer(id) {
+      pendingDealers = pendingDealers.filter(d => d.id !== id);
+      renderDealers();
+      alert('Dealer Approved successfully! Wholesale rates unlocked for user.');
+    }
+
+    function rejectDealer(id) {
+      pendingDealers = pendingDealers.filter(d => d.id !== id);
+      renderDealers();
+    }
+
+    function completeService(id) {
+      serviceRequests = serviceRequests.map(s => s.id === id ? { ...s, status: 'COMPLETED' } : s);
+      renderService();
+    }
+
+    function addMockOrder() {
+      const newId = 'ORD_' + Math.floor(10000 + Math.random() * 90000);
+      orders.unshift({
+        id: newId,
+        customer: 'New Customer Order',
+        item: '1x Califnco Mineral Pro Alkaline RO',
+        amount: '₹14,999',
+        address: 'MG Road, Bengaluru',
+        status: 'ORDER_PLACED',
+        isDealer: false
+      });
+      renderOrders();
+    }
+
+    // Initial Render
+    renderOrders();
+    renderDealers();
+    renderService();
+  </script>
+
+</body>
+</html>
